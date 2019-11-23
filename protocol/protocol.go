@@ -32,16 +32,37 @@ func CreateMoveMsg(hole int) string {
 }
 
 func GetMsgType(msg string) string {
+	msgType := NewMsgType()
 	if strings.HasPrefix(msg, "START;") {
-		return START
+		return msgType.START
 	} else if strings.HasPrefix(msg, "CHANGE;") {
-		return STATE
+		return msgType.STATE
 	} else if strings.HasPrefix(msg, "END\n") {
-		return END
+		return msgType.END
 	} else {
 		return "invalidMessageError: could not determine message type."
 	}
 
+}
+
+// Interprets a "new_match" message. Should be called if
+// GettMsGType(msg) returns MsgType.START
+func InterpretStartMsg(msg string) bool {
+	if msg[len(msg)-1] != '\n' {
+		fmt.Println("invalidMessageError: message not terminated with 0x0A character.")
+	}
+
+	// Message are of the form START:<POSITION> \n
+	position := msg[6 : len(msg)-1]
+	if position == "South" {
+		return true
+	} else if position == "North" {
+		return false
+	} else {
+		fmt.Printf("invalidMessageError: illegal position parameter")
+	}
+	// IMPLEMENT ERROR HANDLING OR THIS WILL BREAK
+	return false
 }
 
 // Interprets a "state_change" message. Should be called if
@@ -61,24 +82,24 @@ func InterpretStateMsg(msg string) MoveTurn {
 	// msgParts[0] is "CHANGE"
 	// 1st argument: the move (or swap)
 	if msgParts[1] == "SWAP" {
-		moveTurn.SetMove(0)
+		moveTurn.Move = 0
 	} else {
 		move, err := strconv.Atoi(msgParts[1])
 		if err != nil {
 			panic(err)
 		}
-		moveTurn.SetMove(move)
+		moveTurn.Move = move
 	}
 
 	// 3rd argument: whose turn
-	moveTurn.SetEnd(false)
+	moveTurn.End = false
 	if msgParts[3] == "YOU\n" {
-		moveTurn.SetAgain(true)
+		moveTurn.Again = true
 	} else if msgParts[3] == "OPP\n" {
-		moveTurn.SetAgain(false)
+		moveTurn.Again = false
 	} else if msgParts[3] == "END\n" {
-		moveTurn.SetEnd(true)
-		moveTurn.SetAgain(false)
+		moveTurn.End = true
+		moveTurn.Again = false
 	} else {
 		fmt.Printf("invalidMessageError: illegal value for turn parameter")
 	}

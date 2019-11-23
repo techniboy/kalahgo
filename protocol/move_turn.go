@@ -1,11 +1,12 @@
 package protocol
 
 type MoveTurn struct {
-	end   bool
-	again bool
-	move  int
+	End   bool
+	Again bool
+	Move  int
 }
 
+/*
 // getter for end in MoveTurn
 func (moveTurn MoveTurn) End() bool {
 	return moveTurn.end
@@ -35,3 +36,4 @@ func (moveTurn *MoveTurn) SetAgain(again bool) {
 func (moveTurn *MoveTurn) SetMove(move int) {
 	moveTurn.move = move
 }
+*/
