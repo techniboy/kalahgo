@@ -29,8 +29,10 @@ func (s Side) Index() int {
 
 // Opposite returns other side
 func (s *Side) Opposite() *Side {
-	s.IsNorth = !s.IsNorth
-	return s
+	if s.IsNorth {
+		return NewSide(southIndex)
+	}
+	return NewSide(northIndex)
 }
 
 // ToString returns string representation of side
