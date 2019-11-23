@@ -1,11 +1,13 @@
 package protocol
 
+// MsgType describes types of messages
 type MsgType struct {
 	START string
 	STATE string
 	END   string
 }
 
+// NewMsgType is a constructor for MsgType
 func NewMsgType() *MsgType {
 	m := new(MsgType)
 	// message announcing the start of the game ("new_match" message)
