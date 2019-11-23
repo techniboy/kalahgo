@@ -3,11 +3,12 @@ package game
 var northIndex = 0
 var southIndex = 1
 
+// Side tells us which player(side) is playing
 type Side struct {
 	IsNorth bool
 }
 
-// constructor for Side
+// NewSide is a constructor for Side
 func NewSide(sideIndex int) *Side {
 	s := new(Side)
 	northIndex = 0
@@ -18,7 +19,7 @@ func NewSide(sideIndex int) *Side {
 	return s
 }
 
-// return side index
+// Index returns index of the side (0 north; 1 south)
 func (s Side) Index() int {
 	if s.IsNorth {
 		return northIndex
@@ -26,13 +27,13 @@ func (s Side) Index() int {
 	return southIndex
 }
 
-// return opposite index
+// Opposite returns other side
 func (s *Side) Opposite() *Side {
 	s.IsNorth = !s.IsNorth
 	return s
 }
 
-// return side as string
+// ToString returns string representation of side
 func (s Side) ToString() string {
 	if s.IsNorth {
 		return "North"
@@ -40,7 +41,7 @@ func (s Side) ToString() string {
 	return "South"
 }
 
-// checks whether side is south, think of this as syntactic sugar
+// IsSouth returns whether to side playing is south (or not)
 func (s Side) IsSouth() bool {
 	if s.IsNorth {
 		return false
