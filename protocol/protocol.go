@@ -2,6 +2,7 @@ package protocol
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -31,52 +32,52 @@ func CreateMoveMsg(hole int) string {
 	return "MOVE;" + string(hole)
 }
 
-func GetMsgType(msg string) string {
+func GetMsgType(msg string) (string, error) {
 	msgType := NewMsgType()
 	if strings.HasPrefix(msg, "START;") {
-		return msgType.START
+		return msgType.START, nil
 	} else if strings.HasPrefix(msg, "CHANGE;") {
-		return msgType.STATE
+		return msgType.STATE, nil
 	} else if strings.HasPrefix(msg, "END\n") {
-		return msgType.END
+		return msgType.END, nil
 	} else {
-		return "invalidMessageError: could not determine message type."
+		return "", errors.New("invalidMessageError: could not determine message type")
 	}
 
 }
 
 // Interprets a "new_match" message. Should be called if
-// GettMsGType(msg) returns MsgType.START
-func InterpretStartMsg(msg string) bool {
+// GettMsgType(msg) returns MsgType.START
+func InterpretStartMsg(msg string) (bool, error) {
 	if msg[len(msg)-1] != '\n' {
-		fmt.Println("invalidMessageError: message not terminated with 0x0A character.")
+		return false, errors.New("invalidMessageError: message not terminated with 0x0A character")
 	}
 
 	// Message are of the form START:<POSITION> \n
 	position := msg[6 : len(msg)-1]
 	if position == "South" {
-		return true
+		return true, nil
 	} else if position == "North" {
-		return false
+		return false, nil
 	} else {
-		fmt.Printf("invalidMessageError: illegal position parameter")
+		return false, errors.New("invalidMessageError: illegal position parameter")
 	}
 	// IMPLEMENT ERROR HANDLING OR THIS WILL BREAK
-	return false
+	return false, nil
 }
 
 // Interprets a "state_change" message. Should be called if
 // GetMsgType(msg) returns MsgType.STATE
-func InterpretStateMsg(msg string) MoveTurn {
-	moveTurn := MoveTurn{}
+func InterpretStateMsg(msg string) (*MoveTurn, error) {
+	moveTurn := new(MoveTurn)
 
 	if msg[len(msg)-1] != '\n' {
-		fmt.Println("invalidMessageError: message not terminated with 0x0A character.")
+		return nil, errors.New("invalidMessageError: message not terminated with 0x0A character")
 	}
 
 	msgParts := strings.SplitN(msg, ":", 4)
 	if len(msgParts) != 4 {
-		fmt.Println("invalidMessageError: missing arguments.")
+		return nil, errors.New("invalidMessageError: missing arguments")
 	}
 
 	// msgParts[0] is "CHANGE"
@@ -101,7 +102,7 @@ func InterpretStateMsg(msg string) MoveTurn {
 		moveTurn.End = true
 		moveTurn.Again = false
 	} else {
-		fmt.Printf("invalidMessageError: illegal value for turn parameter")
+		return nil, errors.New("invalidMessageError: illegal value for turn parameter")
 	}
-	return moveTurn
+	return moveTurn, nil
 }
