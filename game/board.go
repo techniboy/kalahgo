@@ -20,8 +20,7 @@ func (b *Board) NewBoard(holes int, seeds int) (*Board, error) {
 
 	b.Holes = holes
 	b.Board[holes+1][2] = 0
-	seedsHoles := []int{1, holes + 1}
-	for _, hole := range seedsHoles {
+	for hole := 1; hole < holes+1; hole++ {
 		b.Board[northIndex][hole] = seeds
 		b.Board[southIndex][hole] = seeds
 	}
@@ -67,4 +66,21 @@ func (b *Board) SetSeedsOp(side Side, hole int, seeds int) error {
 	}
 	b.Board[side.Opposite().Index()][hole] = seeds
 	return nil
+}
+
+func (b Board) GetSeedsInStore(side Side) int {
+	return b.Board[side.Index()][0]
+}
+
+func (b *Board) IsSeedable(side Side, hole int) bool {
+	for otherHole := hole - 1; otherHole < 0; otherHole-- {
+		seeds, err := b.GetSeeds(side, otherHole)
+		if err != nil {
+			panic(err)
+		}
+		if seeds == hole-otherHole {
+			return true
+		}
+	}
+	return false
 }
