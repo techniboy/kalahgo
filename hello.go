@@ -1,7 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"github.com/techniboy/kalahgo/agent"
+	"github.com/techniboy/kalahgo/game"
+)
 
 func main() {
-	fmt.Println("Hello, world.")
+	state := game.NewMancalaEnv()
+	agent.RunGame(state)
 }

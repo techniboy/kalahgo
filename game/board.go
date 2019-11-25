@@ -2,6 +2,7 @@ package game
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/jinzhu/copier"
 )
@@ -21,11 +22,16 @@ func NewBoard(holes int, seeds int) (*Board, error) {
 	}
 
 	b.Holes = holes
-	b.Board[holes+1][2] = 0
+	b.Board = make([][]int, 2)
+	for i := range b.Board {
+		fmt.Println()
+		b.Board[i] = make([]int, holes+1)
+	}
 	for hole := 1; hole < holes+1; hole++ {
 		b.Board[SideNorth][hole] = seeds
 		b.Board[SideSouth][hole] = seeds
 	}
+	fmt.Println(b.Board)
 	return b, nil
 }
 

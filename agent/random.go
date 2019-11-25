@@ -14,7 +14,8 @@ func mindlessRandom(state *game.MancalaEnv) *game.Move {
 	return legalMoves[rand.Intn(len(legalMoves))]
 }
 
-func runGame(state *game.MancalaEnv) {
+func RunGame(state *game.MancalaEnv) {
+	rand.Seed(time.Now().Unix())
 	ourSide := game.NewSide(game.SideSouth)
 	for {
 		msg := protocol.ReadMsg()
@@ -67,10 +68,4 @@ func runGame(state *game.MancalaEnv) {
 			fmt.Println("Invalid message type:" + msgType)
 		}
 	}
-}
-
-func main() {
-	rand.Seed(time.Now().Unix())
-	state := game.NewMancalaEnv()
-	runGame(state)
 }
