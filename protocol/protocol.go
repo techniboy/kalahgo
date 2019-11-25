@@ -32,6 +32,10 @@ func CreateMoveMsg(hole int) string {
 	return "MOVE;" + string(hole)
 }
 
+func CreateSwapMsg() string {
+	return "SWAP"
+}
+
 func GetMsgType(msg string) (string, error) {
 	msgType := NewMsgType()
 	if strings.HasPrefix(msg, "START;") {
