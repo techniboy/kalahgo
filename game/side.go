@@ -1,7 +1,7 @@
 package game
 
-var northIndex = 0
-var southIndex = 1
+var SideNorth = 0
+var SideSouth = 1
 
 // Side tells us which player(side) is playing
 type Side struct {
@@ -11,9 +11,9 @@ type Side struct {
 // NewSide is a constructor for Side
 func NewSide(sideIndex int) *Side {
 	s := new(Side)
-	northIndex = 0
-	southIndex = 1
-	if sideIndex == northIndex {
+	SideNorth = 0
+	SideSouth = 1
+	if sideIndex == SideNorth {
 		s.IsNorth = true
 	}
 	return s
@@ -22,17 +22,17 @@ func NewSide(sideIndex int) *Side {
 // Index returns index of the side (0 north; 1 south)
 func (s Side) Index() int {
 	if s.IsNorth {
-		return northIndex
+		return SideNorth
 	}
-	return southIndex
+	return SideSouth
 }
 
 // Opposite returns other side
 func (s *Side) Opposite() *Side {
 	if s.IsNorth {
-		return NewSide(southIndex)
+		return NewSide(SideSouth)
 	}
-	return NewSide(northIndex)
+	return NewSide(SideNorth)
 }
 
 // ToString returns string representation of side

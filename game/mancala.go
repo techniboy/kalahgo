@@ -24,15 +24,15 @@ func (m *MancalaEnv) Reset() *MancalaEnv {
 		panic(err)
 	}
 	m.Board = board
-	m.SideToMove = NewSide(southIndex)
+	m.SideToMove = NewSide(SideSouth)
 	m.NorthMoved = false
-	m.OurSide = NewSide(southIndex)
+	m.OurSide = NewSide(SideSouth)
 	return m
 }
 
 func (m *MancalaEnv) Clone() *MancalaEnv {
 	board := m.Board.Clone()
-	sideToMove := NewSide(southIndex)
+	sideToMove := NewSide(SideSouth)
 	copier.Copy(&sideToMove, &m.SideToMove)
 	northMoved := false
 	copier.Copy(&northMoved, &m.NorthMoved)
@@ -44,8 +44,8 @@ func (m *MancalaEnv) Clone() *MancalaEnv {
 	return cloneGame
 }
 
-func (m *MancalaEnv) GetLegalMoves() []*Move {
-	return m.GetStateLegalActions(m.Board, m.SideToMove, m.NorthMoved)
+func (m *MancalaEnv) LegalMoves() []*Move {
+	return m.StateLegalActions(m.Board, m.SideToMove, m.NorthMoved)
 }
 
 func (m *MancalaEnv) PerformMove(move *Move) int {
@@ -68,7 +68,7 @@ func (m *MancalaEnv) PerformMove(move *Move) int {
 	return (seedsInStoreAfter - seedsInStoreBefore) / 100.0
 }
 
-func (m MancalaEnv) GetStateLegalActions(board *Board, side *Side, northMoved bool) []*Move {
+func (m MancalaEnv) StateLegalActions(board *Board, side *Side, northMoved bool) []*Move {
 	// If this is the first move of NORTH, then NORTH can use the pie rule action
 	legalMoves := []*Move{}
 	if northMoved || side.IsSouth() {
@@ -107,7 +107,7 @@ func (m MancalaEnv) HolesEmpty(board *Board, side *Side) bool {
 }
 
 func (m MancalaEnv) GameOver(board *Board) bool {
-	if m.HolesEmpty(board, NewSide(northIndex)) || m.HolesEmpty(board, NewSide(southIndex)) {
+	if m.HolesEmpty(board, NewSide(SideNorth)) || m.HolesEmpty(board, NewSide(SideSouth)) {
 		return true
 	}
 	return false
@@ -140,8 +140,8 @@ func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, 
 	// Sow the seeds for the full rounds
 	if rounds != 0 {
 		for hole := 1; hole < holes+1; hole++ {
-			board.AddSeeds(NewSide(northIndex), hole, rounds)
-			board.AddSeeds(NewSide(southIndex), hole, rounds)
+			board.AddSeeds(NewSide(SideNorth), hole, rounds)
+			board.AddSeeds(NewSide(SideSouth), hole, rounds)
 		}
 		board.AddSeedsToStore(move.Side, rounds)
 	}
@@ -191,9 +191,9 @@ func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, 
 
 	// if the game is over, collect the seeds not in the store and put them there
 	if m.GameOver(board) {
-		finishedSide := NewSide(northIndex)
-		if m.HolesEmpty(board, NewSide(southIndex)) {
-			finishedSide = NewSide(northIndex)
+		finishedSide := NewSide(SideNorth)
+		if m.HolesEmpty(board, NewSide(SideSouth)) {
+			finishedSide = NewSide(SideNorth)
 		}
 		seeds := 0
 		collectingSide := finishedSide.Opposite()
@@ -219,14 +219,14 @@ func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, 
 
 func (m MancalaEnv) SwitchSides(board *Board) {
 	for hole := 1; hole < board.Holes+1; hole++ {
-		temp := board.Board[northIndex][hole]
-		board.Board[northIndex][hole] = board.Board[southIndex][hole]
-		board.Board[southIndex][hole] = temp
+		temp := board.Board[SideNorth][hole]
+		board.Board[SideNorth][hole] = board.Board[SideSouth][hole]
+		board.Board[SideSouth][hole] = temp
 	}
 }
 
 func (m MancalaEnv) IsLegalAction(board *Board, move *Move, northMoved bool) bool {
-	actions := m.GetStateLegalActions(board, move.Side, northMoved)
+	actions := m.StateLegalActions(board, move.Side, northMoved)
 	for _, action := range actions {
 		if move.Index == action.Index {
 			return true

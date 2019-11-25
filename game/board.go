@@ -23,8 +23,8 @@ func NewBoard(holes int, seeds int) (*Board, error) {
 	b.Holes = holes
 	b.Board[holes+1][2] = 0
 	for hole := 1; hole < holes+1; hole++ {
-		b.Board[northIndex][hole] = seeds
-		b.Board[southIndex][hole] = seeds
+		b.Board[SideNorth][hole] = seeds
+		b.Board[SideSouth][hole] = seeds
 	}
 	return b, nil
 }
@@ -35,8 +35,8 @@ func (b *Board) Clone() *Board {
 		panic(err)
 	}
 	for hole := 1; hole < b.Holes+1; hole++ {
-		copier.Copy(cloneBoard.Board[northIndex][hole], b.Board[northIndex][hole])
-		copier.Copy(cloneBoard.Board[southIndex][hole], b.Board[southIndex][hole])
+		copier.Copy(cloneBoard.Board[SideNorth][hole], b.Board[SideNorth][hole])
+		copier.Copy(cloneBoard.Board[SideSouth][hole], b.Board[SideSouth][hole])
 	}
 	return cloneBoard
 }
