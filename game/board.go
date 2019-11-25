@@ -10,7 +10,8 @@ type Board struct {
 	Board [][]int
 }
 
-func (b *Board) NewBoard(holes int, seeds int) (*Board, error) {
+func NewBoard(holes int, seeds int) (*Board, error) {
+	b := new(Board)
 	if holes < 1 {
 		return nil, errors.New("valueError: there has to be atleast one hole")
 	}
@@ -27,19 +28,19 @@ func (b *Board) NewBoard(holes int, seeds int) (*Board, error) {
 	return b, nil
 }
 
-func (b *Board) Clone(orginalBoard *Board) *Board {
+func (b Board) Clone(orginalBoard *Board) *Board {
 	fmt.Println("function not implemented yet")
-	return b
+	return &b
 }
 
-func (b Board) GetSeeds(side Side, hole int) (int, error) {
+func (b Board) Seeds(side *Side, hole int) (int, error) {
 	if hole < 1 || hole > b.Holes {
 		return -1, errors.New("valueError: hole number must be between 1 and no. of holes")
 	}
 	return b.Board[side.Index()][hole], nil
 }
 
-func (b *Board) SetSeeds(side Side, hole int, seeds int) error {
+func (b *Board) SetSeeds(side *Side, hole int, seeds int) error {
 	if hole < 1 || hole > b.Holes {
 		return errors.New("valueError: hole number must be between 1 and no. of holes")
 	}
@@ -50,14 +51,14 @@ func (b *Board) SetSeeds(side Side, hole int, seeds int) error {
 	return nil
 }
 
-func (b Board) GetSeedsOp(side Side, hole int) (int, error) {
+func (b Board) SeedsOp(side *Side, hole int) (int, error) {
 	if hole < 1 || hole > b.Holes {
 		return -1, errors.New("valueError: hole number must be between 1 and no. of holes")
 	}
 	return b.Board[side.Opposite().Index()][hole], nil
 }
 
-func (b *Board) SetSeedsOp(side Side, hole int, seeds int) error {
+func (b *Board) SetSeedsOp(side *Side, hole int, seeds int) error {
 	if hole < 1 || hole > b.Holes {
 		return errors.New("valueError: hole number must be between 1 and no. of holes")
 	}
@@ -68,13 +69,40 @@ func (b *Board) SetSeedsOp(side Side, hole int, seeds int) error {
 	return nil
 }
 
-func (b Board) GetSeedsInStore(side Side) int {
+func (b *Board) AddSeeds(side *Side, hole int, seeds int) error {
+	if hole < 1 || hole > b.Holes {
+		return errors.New("valueError: hole number must be between 1 and no. of holes")
+	}
+	if seeds < 0 {
+		return errors.New("valueError: there has to be a non-negative no. of seeds")
+	}
+	b.Board[side.Index()][hole] += seeds
+	return nil
+}
+
+func (b *Board) AddSeedsToStore(side *Side, seeds int) error {
+	if seeds < 0 {
+		return errors.New("valueError: there has to be a non-negative no. of seeds")
+	}
+	b.Board[side.Index()][0] += seeds
+	return nil
+}
+
+func (b Board) SeedsInStore(side *Side) int {
 	return b.Board[side.Index()][0]
 }
 
-func (b *Board) IsSeedable(side Side, hole int) bool {
-	for otherHole := hole - 1; otherHole < 0; otherHole-- {
-		seeds, err := b.GetSeeds(side, otherHole)
+func (b *Board) SetSeedsInStore(side *Side, seeds int) error {
+	if seeds < 0 {
+		return errors.New("valueError: there has to be a non-negative no. of seeds")
+	}
+	b.Board[side.Index()][0] = seeds
+	return nil
+}
+
+func (b *Board) IsSeedable(side *Side, hole int) bool {
+	for otherHole := hole - 1; otherHole > 0; otherHole-- {
+		seeds, err := b.Seeds(side, otherHole)
 		if err != nil {
 			panic(err)
 		}
