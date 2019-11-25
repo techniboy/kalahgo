@@ -1,7 +1,7 @@
 package agent
 
 import (
-	"fmt"
+	"log"
 	"math/rand"
 	"time"
 
@@ -15,13 +15,14 @@ func mindlessRandom(state *game.MancalaEnv) *game.Move {
 }
 
 func RunGame(state *game.MancalaEnv) {
+	log.Println("starting game...")
 	rand.Seed(time.Now().Unix())
 	ourSide := game.NewSide(game.SideSouth)
 	for {
 		msg := protocol.ReadMsg()
 		msgType, err := protocol.GetMsgType(msg)
 		if err != nil {
-			panic(err)
+			log.Panic(err)
 		}
 
 		messageType := protocol.NewMsgType()
@@ -29,7 +30,7 @@ func RunGame(state *game.MancalaEnv) {
 		if msgType == messageType.START {
 			first, err := protocol.InterpretStartMsg(msg)
 			if err != nil {
-				panic(err)
+				log.Panic(err)
 			}
 			if first {
 				move := mindlessRandom(state)
@@ -40,7 +41,7 @@ func RunGame(state *game.MancalaEnv) {
 		} else if msgType == messageType.STATE {
 			moveTurn, err := protocol.InterpretStateMsg(msg)
 			if err != nil {
-				panic(err)
+				log.Panic(err)
 			}
 			if moveTurn.Move == 0 {
 				ourSide = ourSide.Opposite()
@@ -48,7 +49,7 @@ func RunGame(state *game.MancalaEnv) {
 
 			moveToPerform, err := game.NewMove(state.SideToMove, moveTurn.Move)
 			if err != nil {
-				panic(err)
+				log.Panic(err)
 			}
 
 			state.PerformMove(moveToPerform)
@@ -63,9 +64,10 @@ func RunGame(state *game.MancalaEnv) {
 				}
 			}
 		} else if msgType == messageType.END {
+			log.Println("Game engine ended the game")
 			break
 		} else {
-			fmt.Println("Invalid message type:" + msgType)
+			log.Println("Invalid message type:" + msgType)
 		}
 	}
 }

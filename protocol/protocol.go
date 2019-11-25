@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -11,6 +12,7 @@ import (
 
 // Send a message to the game engine
 func SendMsg(msg string) {
+	log.Println("Sending message to the game engine: " + msg)
 	fmt.Println(msg)
 }
 
@@ -18,18 +20,18 @@ func SendMsg(msg string) {
 // a '\n' character.
 func ReadMsg() string {
 	reader := bufio.NewReader(os.Stdin)
-	text, err := reader.ReadString('\n')
+	msg, err := reader.ReadString('\n')
 
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
-
-	return text
+	log.Println("Received message from the game engine: " + msg)
+	return msg
 }
 
 // Creates a move message
 func CreateMoveMsg(hole int) string {
-	return "MOVE;" + string(hole)
+	return fmt.Sprintf("MOVE;%d", hole)
 }
 
 func CreateSwapMsg() string {
@@ -66,8 +68,6 @@ func InterpretStartMsg(msg string) (bool, error) {
 	} else {
 		return false, errors.New("invalidMessageError: illegal position parameter")
 	}
-	// IMPLEMENT ERROR HANDLING OR THIS WILL BREAK
-	return false, nil
 }
 
 // Interprets a "state_change" message. Should be called if
@@ -79,7 +79,7 @@ func InterpretStateMsg(msg string) (*MoveTurn, error) {
 		return nil, errors.New("invalidMessageError: message not terminated with 0x0A character")
 	}
 
-	msgParts := strings.SplitN(msg, ":", 4)
+	msgParts := strings.SplitN(msg, ";", 4)
 	if len(msgParts) != 4 {
 		return nil, errors.New("invalidMessageError: missing arguments")
 	}
@@ -91,7 +91,7 @@ func InterpretStateMsg(msg string) (*MoveTurn, error) {
 	} else {
 		move, err := strconv.Atoi(msgParts[1])
 		if err != nil {
-			panic(err)
+			log.Panic(err)
 		}
 		moveTurn.Move = move
 	}

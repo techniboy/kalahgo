@@ -3,6 +3,7 @@ package game
 import (
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/jinzhu/copier"
 )
@@ -31,14 +32,13 @@ func NewBoard(holes int, seeds int) (*Board, error) {
 		b.Board[SideNorth][hole] = seeds
 		b.Board[SideSouth][hole] = seeds
 	}
-	fmt.Println(b.Board)
 	return b, nil
 }
 
 func (b *Board) Clone() *Board {
 	cloneBoard, err := NewBoard(b.Holes, 0)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 	for hole := 1; hole < b.Holes+1; hole++ {
 		copier.Copy(cloneBoard.Board[SideNorth][hole], b.Board[SideNorth][hole])
@@ -48,6 +48,9 @@ func (b *Board) Clone() *Board {
 }
 
 func (b Board) Seeds(side *Side, hole int) (int, error) {
+	log.Println("starting Seeds..")
+	log.Printf("hole = %d", hole)
+	log.Printf("b.Holes = %d", b.Holes)
 	if hole < 1 || hole > b.Holes {
 		return -1, errors.New("valueError: hole number must be between 1 and no. of holes")
 	}
@@ -118,7 +121,7 @@ func (b *Board) IsSeedable(side *Side, hole int) bool {
 	for otherHole := hole - 1; otherHole > 0; otherHole-- {
 		seeds, err := b.Seeds(side, otherHole)
 		if err != nil {
-			panic(err)
+			log.Panic(err)
 		}
 		if seeds == hole-otherHole {
 			return true
