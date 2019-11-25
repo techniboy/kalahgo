@@ -2,7 +2,6 @@ package game
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/jinzhu/copier"
 )
@@ -31,13 +30,12 @@ func (m *MancalaEnv) Reset() *MancalaEnv {
 	return m
 }
 
-func (m MancalaEnv) Clone(otherState MancalaEnv) *MancalaEnv {
-	fmt.Println("Clone method is broken, doesn't work, fix it")
-	board := Board.Clone(otherState.Board)
+func (m *MancalaEnv) Clone() *MancalaEnv {
+	board := m.Board.Clone()
 	sideToMove := NewSide(southIndex)
-	copier.Copy(&sideToMove, &otherState.SideToMove)
+	copier.Copy(&sideToMove, &m.SideToMove)
 	northMoved := false
-	copier.Copy(&northMoved, &otherState.NorthMoved)
+	copier.Copy(&northMoved, &m.NorthMoved)
 
 	cloneGame := NewMancalaEnv()
 	cloneGame.Board = board

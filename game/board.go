@@ -2,7 +2,8 @@ package game
 
 import (
 	"errors"
-	"fmt"
+
+	"github.com/jinzhu/copier"
 )
 
 type Board struct {
@@ -28,9 +29,16 @@ func NewBoard(holes int, seeds int) (*Board, error) {
 	return b, nil
 }
 
-func (b Board) Clone(orginalBoard *Board) *Board {
-	fmt.Println("function not implemented yet")
-	return &b
+func (b *Board) Clone() *Board {
+	cloneBoard, err := NewBoard(b.Holes, 0)
+	if err != nil {
+		panic(err)
+	}
+	for hole := 1; hole < b.Holes+1; hole++ {
+		copier.Copy(cloneBoard.Board[northIndex][hole], b.Board[northIndex][hole])
+		copier.Copy(cloneBoard.Board[southIndex][hole], b.Board[southIndex][hole])
+	}
+	return cloneBoard
 }
 
 func (b Board) Seeds(side *Side, hole int) (int, error) {
