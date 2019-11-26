@@ -1,35 +1,34 @@
 package protocol
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
-	"os"
+	"log"
 	"strconv"
 	"strings"
 )
 
 // Send a message to the game engine
-func SendMsg(msg string) {
-	fmt.Println(msg)
+func SendMsg(gameConn *GameConnection, msg string) {
+	msg = fmt.Sprintln(msg)
+	log.Printf("Sent: %s\n", msg)
+	gameConn.connection.Write([]byte(msg))
 }
 
 // Receives a message from the game engine. Messages are terminated by
 // a '\n' character.
-func ReadMsg() string {
-	reader := bufio.NewReader(os.Stdin)
-	text, err := reader.ReadString('\n')
-
+func ReadMsg(gameConn *GameConnection) string {
+	msg, err := gameConn.connReader.ReadString('\n')
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
-
-	return text
+	log.Printf("Received: %s", msg)
+	return msg
 }
 
 // Creates a move message
 func CreateMoveMsg(hole int) string {
-	return "MOVE;" + string(hole)
+	return fmt.Sprintf("MOVE;%d", hole)
 }
 
 func CreateSwapMsg() string {
@@ -66,8 +65,6 @@ func InterpretStartMsg(msg string) (bool, error) {
 	} else {
 		return false, errors.New("invalidMessageError: illegal position parameter")
 	}
-	// IMPLEMENT ERROR HANDLING OR THIS WILL BREAK
-	return false, nil
 }
 
 // Interprets a "state_change" message. Should be called if
@@ -79,7 +76,7 @@ func InterpretStateMsg(msg string) (*MoveTurn, error) {
 		return nil, errors.New("invalidMessageError: message not terminated with 0x0A character")
 	}
 
-	msgParts := strings.SplitN(msg, ":", 4)
+	msgParts := strings.SplitN(msg, ";", 4)
 	if len(msgParts) != 4 {
 		return nil, errors.New("invalidMessageError: missing arguments")
 	}
@@ -87,11 +84,12 @@ func InterpretStateMsg(msg string) (*MoveTurn, error) {
 	// msgParts[0] is "CHANGE"
 	// 1st argument: the move (or swap)
 	if msgParts[1] == "SWAP" {
+		log.Printf("Opponent requested swap")
 		moveTurn.Move = 0
 	} else {
 		move, err := strconv.Atoi(msgParts[1])
 		if err != nil {
-			panic(err)
+			log.Panic(err)
 		}
 		moveTurn.Move = move
 	}
@@ -108,5 +106,7 @@ func InterpretStateMsg(msg string) (*MoveTurn, error) {
 	} else {
 		return nil, errors.New("invalidMessageError: illegal value for turn parameter")
 	}
+	log.Printf("Is the game over? %t", moveTurn.End)
+	log.Printf("Is it our turn again? %t", moveTurn.Again)
 	return moveTurn, nil
 }

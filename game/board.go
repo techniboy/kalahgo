@@ -3,6 +3,7 @@ package game
 import (
 	"errors"
 	"fmt"
+	"log"
 
 	"github.com/jinzhu/copier"
 )
@@ -31,14 +32,13 @@ func NewBoard(holes int, seeds int) (*Board, error) {
 		b.Board[SideNorth][hole] = seeds
 		b.Board[SideSouth][hole] = seeds
 	}
-	fmt.Println(b.Board)
 	return b, nil
 }
 
 func (b *Board) Clone() *Board {
 	cloneBoard, err := NewBoard(b.Holes, 0)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 	for hole := 1; hole < b.Holes+1; hole++ {
 		copier.Copy(cloneBoard.Board[SideNorth][hole], b.Board[SideNorth][hole])
@@ -69,7 +69,7 @@ func (b Board) SeedsOp(side *Side, hole int) (int, error) {
 	if hole < 1 || hole > b.Holes {
 		return -1, errors.New("valueError: hole number must be between 1 and no. of holes")
 	}
-	return b.Board[side.Opposite().Index()][hole], nil
+	return b.Board[side.Opposite().Index()][b.Holes+1-hole], nil
 }
 
 func (b *Board) SetSeedsOp(side *Side, hole int, seeds int) error {
@@ -79,7 +79,7 @@ func (b *Board) SetSeedsOp(side *Side, hole int, seeds int) error {
 	if seeds < 0 {
 		return errors.New("valueError: there has to be a non-negative no. of seeds")
 	}
-	b.Board[side.Opposite().Index()][hole] = seeds
+	b.Board[side.Opposite().Index()][b.Holes+1-hole] = seeds
 	return nil
 }
 
@@ -118,7 +118,7 @@ func (b *Board) IsSeedable(side *Side, hole int) bool {
 	for otherHole := hole - 1; otherHole > 0; otherHole-- {
 		seeds, err := b.Seeds(side, otherHole)
 		if err != nil {
-			panic(err)
+			log.Panic(err)
 		}
 		if seeds == hole-otherHole {
 			return true
