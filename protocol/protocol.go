@@ -11,7 +11,7 @@ import (
 // Send a message to the game engine
 func SendMsg(gameConn *GameConnection, msg string) {
 	msg = fmt.Sprintln(msg)
-	log.Printf("Sent: %s", msg)
+	log.Printf("Sent: %s\n", msg)
 	gameConn.connection.Write([]byte(msg))
 }
 
@@ -84,6 +84,7 @@ func InterpretStateMsg(msg string) (*MoveTurn, error) {
 	// msgParts[0] is "CHANGE"
 	// 1st argument: the move (or swap)
 	if msgParts[1] == "SWAP" {
+		log.Printf("Opponent requested swap")
 		moveTurn.Move = 0
 	} else {
 		move, err := strconv.Atoi(msgParts[1])
@@ -105,5 +106,7 @@ func InterpretStateMsg(msg string) (*MoveTurn, error) {
 	} else {
 		return nil, errors.New("invalidMessageError: illegal value for turn parameter")
 	}
+	log.Printf("Is the game over? %t", moveTurn.End)
+	log.Printf("Is it our turn again? %t", moveTurn.Again)
 	return moveTurn, nil
 }

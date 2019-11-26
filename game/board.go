@@ -69,7 +69,7 @@ func (b Board) SeedsOp(side *Side, hole int) (int, error) {
 	if hole < 1 || hole > b.Holes {
 		return -1, errors.New("valueError: hole number must be between 1 and no. of holes")
 	}
-	return b.Board[side.Opposite().Index()][hole], nil
+	return b.Board[side.Opposite().Index()][b.Holes+1-hole], nil
 }
 
 func (b *Board) SetSeedsOp(side *Side, hole int, seeds int) error {
@@ -79,7 +79,7 @@ func (b *Board) SetSeedsOp(side *Side, hole int, seeds int) error {
 	if seeds < 0 {
 		return errors.New("valueError: there has to be a non-negative no. of seeds")
 	}
-	b.Board[side.Opposite().Index()][hole] = seeds
+	b.Board[side.Opposite().Index()][b.Holes+1-hole] = seeds
 	return nil
 }
 

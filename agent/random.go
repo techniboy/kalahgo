@@ -17,7 +17,7 @@ func mindlessRandom(state *game.MancalaEnv) *game.Move {
 func RunGame(state *game.MancalaEnv) {
 	log.Println("starting game...")
 	rand.Seed(time.Now().Unix())
-	gameConn, err := protocol.NewGameConnection("127.0.0.1", "12340")
+	gameConn, err := protocol.NewGameConnection("127.0.0.1", "12345")
 	if err != nil {
 		log.Panic(err)
 	}

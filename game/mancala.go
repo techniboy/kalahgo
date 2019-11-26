@@ -54,6 +54,7 @@ func (m *MancalaEnv) LegalMoves() []*Move {
 
 func (m *MancalaEnv) PerformMove(move *Move) int {
 	log.Println("Performing Move..")
+	log.Printf("Before move: %v", m.Board.Board)
 	seedsInStoreBefore := m.Board.SeedsInStore(move.Side)
 	// pie move
 	if move.Index == 0 {
@@ -68,7 +69,7 @@ func (m *MancalaEnv) PerformMove(move *Move) int {
 		m.NorthMoved = true
 	}
 	seedsInStoreAfter := m.Board.SeedsInStore(move.Side)
-
+	log.Printf("After move: %v", m.Board.Board)
 	// return a partial reward proportional to the number of captured seeds
 	return (seedsInStoreAfter - seedsInStoreBefore) / 100.0
 }
@@ -120,9 +121,8 @@ func (m MancalaEnv) GameOver(board *Board) bool {
 
 func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, error) {
 	log.Println("Starting function MakeMove")
-	log.Println(board.Board)
 	if !m.IsLegalAction(board, move, northMoved) {
-		return nil, errors.New("illegalMove: an illegal m ove was tried to play")
+		return nil, errors.New("illegalMove: an illegal move was tried to play")
 	}
 	// check for pie rule/move
 	if move.Index == 0 {
@@ -162,7 +162,7 @@ func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, 
 			sowSide = sowSide.Opposite()
 		}
 		if sowHole > holes {
-			if sowSide == move.Side {
+			if sowSide.Index() == move.Side.Index() {
 				sowHole = 0
 				board.AddSeedsToStore(sowSide, 1)
 				continue
@@ -176,7 +176,7 @@ func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, 
 
 	// Capture the opponent's seeds from the opposite hole if the last seed
 	// is placed in an empty hole and there are seeds in the opposite hole
-	if sowHole > 0 {
+	if sowHole > 0 && sowSide.Index() == move.Side.Index() {
 		sowSeeds, err := board.Seeds(sowSide, sowHole)
 		if err != nil {
 			log.Panic(err)
@@ -185,8 +185,10 @@ func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, 
 		if err != nil {
 			log.Panic(err)
 		}
-		if sowSide == move.Side && sowSeeds == 1 && sowSeedsOp > 0 {
-			err := board.AddSeedsToStore(move.Side, 1)
+		log.Print(sowSeeds == 1 && sowSeedsOp > 0)
+		if sowSeeds == 1 && sowSeedsOp > 0 {
+			log.Println("Capture activated")
+			err := board.AddSeedsToStore(move.Side, 1+sowSeedsOp)
 			if err != nil {
 				log.Panic(err)
 			}
@@ -195,6 +197,9 @@ func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, 
 				log.Panic(err)
 			}
 			err = board.SetSeedsOp(move.Side, sowHole, 0)
+			if err != nil {
+				log.Panic(err)
+			}
 		}
 	}
 
@@ -235,14 +240,12 @@ func (m MancalaEnv) SwitchSides(board *Board) {
 }
 
 func (m MancalaEnv) IsLegalAction(board *Board, move *Move, northMoved bool) bool {
+	log.Printf("action to be performed by %s: %d", move.Side.ToString(), move.Index)
 	log.Println("checking if action to be performed is legal..")
 	actions := m.StateLegalActions(board, move.Side, northMoved)
-	for _, i := range actions {
-		log.Print(i.Index)
-	}
 	for _, action := range actions {
 		if move.Index == action.Index {
-			log.Printf("Legal action found: MOVE;%d", move.Index)
+			log.Printf("Legal action found")
 			return true
 		}
 	}
