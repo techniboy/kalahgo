@@ -48,9 +48,6 @@ func (b *Board) Clone() *Board {
 }
 
 func (b Board) Seeds(side *Side, hole int) (int, error) {
-	log.Println("starting Seeds..")
-	log.Printf("hole = %d", hole)
-	log.Printf("b.Holes = %d", b.Holes)
 	if hole < 1 || hole > b.Holes {
 		return -1, errors.New("valueError: hole number must be between 1 and no. of holes")
 	}

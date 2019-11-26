@@ -1,31 +1,28 @@
 package protocol
 
 import (
-	"bufio"
 	"errors"
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 	"strings"
 )
 
 // Send a message to the game engine
-func SendMsg(msg string) {
-	log.Println("Sending message to the game engine: " + msg)
-	fmt.Println(msg)
+func SendMsg(gameConn *GameConnection, msg string) {
+	msg = fmt.Sprintln(msg)
+	log.Printf("Sent: %s", msg)
+	gameConn.connection.Write([]byte(msg))
 }
 
 // Receives a message from the game engine. Messages are terminated by
 // a '\n' character.
-func ReadMsg() string {
-	reader := bufio.NewReader(os.Stdin)
-	msg, err := reader.ReadString('\n')
-
+func ReadMsg(gameConn *GameConnection) string {
+	msg, err := gameConn.connReader.ReadString('\n')
 	if err != nil {
 		log.Panic(err)
 	}
-	log.Println("Received message from the game engine: " + msg)
+	log.Printf("Received: %s", msg)
 	return msg
 }
 

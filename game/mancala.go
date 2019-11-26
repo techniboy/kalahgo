@@ -49,7 +49,6 @@ func (m *MancalaEnv) Clone() *MancalaEnv {
 }
 
 func (m *MancalaEnv) LegalMoves() []*Move {
-	log.Println("Generating legal moves..")
 	return m.StateLegalActions(m.Board, m.SideToMove, m.NorthMoved)
 }
 
@@ -75,11 +74,8 @@ func (m *MancalaEnv) PerformMove(move *Move) int {
 }
 
 func (m MancalaEnv) StateLegalActions(board *Board, side *Side, northMoved bool) []*Move {
-	log.Println("Stating all legal actions..")
 	// If this is the first move of NORTH, then NORTH can use the pie rule action
 	var legalMoves []*Move
-	log.Printf("northMoved = %t", northMoved)
-	log.Printf("side.IsSouth() = %t", side.IsSouth())
 	if northMoved || side.IsSouth() {
 		legalMoves = []*Move{}
 	} else {
@@ -124,6 +120,7 @@ func (m MancalaEnv) GameOver(board *Board) bool {
 
 func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, error) {
 	log.Println("Starting function MakeMove")
+	log.Println(board.Board)
 	if !m.IsLegalAction(board, move, northMoved) {
 		return nil, errors.New("illegalMove: an illegal m ove was tried to play")
 	}
@@ -159,8 +156,6 @@ func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, 
 	// sow remaining seeds
 	sowSide := move.Side
 	sowHole := move.Index
-	log.Println("Beofre sowing remaining seeds")
-	log.Printf("sowHole = %d", sowHole)
 	for i := 0; i < remainingSeeds; i++ {
 		sowHole++
 		if sowHole == 1 {
@@ -176,15 +171,11 @@ func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, 
 				sowHole = 1
 			}
 		}
-		log.Println("Right before adding seeds")
-		log.Printf("sowHole = %d", sowHole)
 		board.AddSeeds(sowSide, sowHole, 1)
 	}
 
 	// Capture the opponent's seeds from the opposite hole if the last seed
 	// is placed in an empty hole and there are seeds in the opposite hole
-	log.Println("Right After sowing seeds")
-	log.Printf("sowHole = %d", sowHole)
 	if sowHole > 0 {
 		sowSeeds, err := board.Seeds(sowSide, sowHole)
 		if err != nil {
@@ -246,10 +237,12 @@ func (m MancalaEnv) SwitchSides(board *Board) {
 func (m MancalaEnv) IsLegalAction(board *Board, move *Move, northMoved bool) bool {
 	log.Println("checking if action to be performed is legal..")
 	actions := m.StateLegalActions(board, move.Side, northMoved)
-	log.Printf("actions = %v", actions)
+	for _, i := range actions {
+		log.Print(i.Index)
+	}
 	for _, action := range actions {
 		if move.Index == action.Index {
-			log.Println("Legal action found")
+			log.Printf("Legal action found: MOVE;%d", move.Index)
 			return true
 		}
 	}
