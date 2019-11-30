@@ -13,6 +13,12 @@ type MCTS struct {
 	RunTime time.Duration
 }
 
+func NewMCTS(runTime time.Duration) *MCTS {
+	mcts := new(MCTS)
+	mcts.RunTime = runTime
+	return mcts
+}
+
 func (mcts *MCTS) Search(state *game.MancalaEnv) *game.Move {
 	gameStateRoot := graph.NewNode(state.Clone(), nil, nil)
 	gamesPlayed := 0
