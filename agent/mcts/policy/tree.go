@@ -29,7 +29,7 @@ func MctpExpand(n *graph.Node) *graph.Node {
 	childState := n.State.Clone()
 	moveReward := childState.PerformMove(childExpansionMove)
 	childNode := graph.NewNode(childState, childExpansionMove, n)
-	childNode.Update(float64(moveReward))
+	childNode.Update(moveReward)
 	n.InsertChild(childNode)
 	return childNode
 }

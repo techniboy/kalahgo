@@ -34,10 +34,7 @@ func (m *MancalaEnv) Reset() *MancalaEnv {
 }
 
 func (m *MancalaEnv) Clone() *MancalaEnv {
-	log.Println("Cloning MancalaEnv..")
-	log.Printf("orignalBoard = %v", m.Board)
 	board := m.Board.Clone()
-	log.Printf("clonedBoard = %v", board)
 	sideToMove := NewSide(SideSouth)
 	copier.Copy(&sideToMove, &m.SideToMove)
 	northMoved := false
@@ -54,9 +51,7 @@ func (m *MancalaEnv) LegalMoves() []*Move {
 	return m.StateLegalActions(m.Board, m.SideToMove, m.NorthMoved)
 }
 
-func (m *MancalaEnv) PerformMove(move *Move) int {
-	log.Println("Performing Move..")
-	log.Printf("Before move: %v", m.Board.Board)
+func (m *MancalaEnv) PerformMove(move *Move) float64 {
 	seedsInStoreBefore := m.Board.SeedsInStore(move.Side)
 	// pie move
 	if move.Index == 0 {
@@ -71,9 +66,8 @@ func (m *MancalaEnv) PerformMove(move *Move) int {
 		m.NorthMoved = true
 	}
 	seedsInStoreAfter := m.Board.SeedsInStore(move.Side)
-	log.Printf("After move: %v", m.Board.Board)
 	// return a partial reward proportional to the number of captured seeds
-	return (seedsInStoreAfter - seedsInStoreBefore) / 100.0
+	return float64((seedsInStoreAfter - seedsInStoreBefore)) / 100.0
 }
 
 func (m MancalaEnv) StateLegalActions(board *Board, side *Side, northMoved bool) []*Move {
@@ -122,7 +116,6 @@ func (m MancalaEnv) GameOver(board *Board) bool {
 }
 
 func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, error) {
-	log.Println("Starting function MakeMove")
 	if !m.IsLegalAction(board, move, northMoved) {
 		return nil, errors.New("illegalMove: an illegal move was tried to play")
 	}
@@ -189,7 +182,6 @@ func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, 
 		}
 		log.Print(sowSeeds == 1 && sowSeedsOp > 0)
 		if sowSeeds == 1 && sowSeedsOp > 0 {
-			log.Println("Capture activated")
 			err := board.AddSeedsToStore(move.Side, 1+sowSeedsOp)
 			if err != nil {
 				log.Panic(err)
@@ -242,15 +234,11 @@ func (m MancalaEnv) SwitchSides(board *Board) {
 }
 
 func (m MancalaEnv) IsLegalAction(board *Board, move *Move, northMoved bool) bool {
-	log.Printf("action to be performed by %s: %d", move.Side.ToString(), move.Index)
-	log.Println("checking if action to be performed is legal..")
 	actions := m.StateLegalActions(board, move.Side, northMoved)
 	for _, action := range actions {
 		if move.Index == action.Index {
-			log.Printf("Legal action found")
 			return true
 		}
 	}
-	log.Println("No legal action found")
 	return false
 }

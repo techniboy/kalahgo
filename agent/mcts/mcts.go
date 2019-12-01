@@ -33,5 +33,6 @@ func (mcts *MCTS) Search(state *game.MancalaEnv) *game.Move {
 	if err != nil {
 		log.Panic(err)
 	}
+	log.Printf("gamesPlayed = %d", gamesPlayed)
 	return maxChild.Move
 }

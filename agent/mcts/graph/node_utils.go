@@ -21,7 +21,6 @@ func SelectBestChild(n *Node) (*Node, error) {
 	} else if len(n.Children) == 1 {
 		return n.Children[0], nil
 	}
-
 	maxChild, maxUCT := n.Children[0], uctReward(n, n.Children[0], 1/math.Sqrt(2))
 	for _, child := range n.Children[1:] {
 		childReward := uctReward(n, child, 1/math.Sqrt(2))
