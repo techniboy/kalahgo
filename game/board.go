@@ -2,10 +2,7 @@ package game
 
 import (
 	"errors"
-	"fmt"
 	"log"
-
-	"github.com/jinzhu/copier"
 )
 
 type Board struct {
@@ -25,7 +22,6 @@ func NewBoard(holes int, seeds int) (*Board, error) {
 	b.Holes = holes
 	b.Board = make([][]int, 2)
 	for i := range b.Board {
-		fmt.Println()
 		b.Board[i] = make([]int, holes+1)
 	}
 	for hole := 1; hole < holes+1; hole++ {
@@ -36,13 +32,14 @@ func NewBoard(holes int, seeds int) (*Board, error) {
 }
 
 func (b *Board) Clone() *Board {
+	log.Println("Cloning board..")
 	cloneBoard, err := NewBoard(b.Holes, 0)
 	if err != nil {
 		log.Panic(err)
 	}
 	for hole := 1; hole < b.Holes+1; hole++ {
-		copier.Copy(cloneBoard.Board[SideNorth][hole], b.Board[SideNorth][hole])
-		copier.Copy(cloneBoard.Board[SideSouth][hole], b.Board[SideSouth][hole])
+		cloneBoard.Board[SideNorth][hole] = b.Board[SideNorth][hole]
+		cloneBoard.Board[SideSouth][hole] = b.Board[SideSouth][hole]
 	}
 	return cloneBoard
 }

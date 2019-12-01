@@ -10,10 +10,10 @@ import (
 )
 
 type MCTS struct {
-	RunTime time.Duration
+	RunTime float64
 }
 
-func NewMCTS(runTime time.Duration) *MCTS {
+func NewMCTS(runTime float64) *MCTS {
 	mcts := new(MCTS)
 	mcts.RunTime = runTime
 	return mcts
@@ -23,7 +23,7 @@ func (mcts *MCTS) Search(state *game.MancalaEnv) *game.Move {
 	gameStateRoot := graph.NewNode(state.Clone(), nil, nil)
 	gamesPlayed := 0
 	startTime := time.Now()
-	for time.Now().Sub(startTime) < mcts.RunTime {
+	for time.Now().Sub(startTime).Seconds() < mcts.RunTime {
 		node := policy.MctpSelect(gameStateRoot)
 		policy.McdpSimuilate(node)
 		graph.Backpropagate(node)

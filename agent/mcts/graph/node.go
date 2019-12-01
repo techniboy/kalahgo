@@ -1,6 +1,8 @@
 package graph
 
-import "github.com/techniboy/kalahgo/game"
+import (
+	"github.com/techniboy/kalahgo/game"
+)
 
 type Node struct {
 	Visits          float64

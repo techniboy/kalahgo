@@ -34,8 +34,10 @@ func (m *MancalaEnv) Reset() *MancalaEnv {
 }
 
 func (m *MancalaEnv) Clone() *MancalaEnv {
-	log.Println("Cloning MancalaEnv")
+	log.Println("Cloning MancalaEnv..")
+	log.Printf("orignalBoard = %v", m.Board)
 	board := m.Board.Clone()
+	log.Printf("clonedBoard = %v", board)
 	sideToMove := NewSide(SideSouth)
 	copier.Copy(&sideToMove, &m.SideToMove)
 	northMoved := false
