@@ -2,33 +2,24 @@ package agent
 
 import (
 	"log"
-	"math/rand"
-	"time"
 
+	"github.com/techniboy/kalahgo/agent/mcts"
 	"github.com/techniboy/kalahgo/game"
 	"github.com/techniboy/kalahgo/protocol"
 )
 
-func mindlessRandom(state *game.MancalaEnv) *game.Move {
-	legalMoves := state.LegalMoves()
-	return legalMoves[rand.Intn(len(legalMoves))]
-}
-
-func RunGameRandom(state *game.MancalaEnv) {
+func RunGameMCTS(state *game.MancalaEnv, mcts *mcts.MCTS) {
 	log.Println("starting game...")
-	rand.Seed(time.Now().Unix())
 	gameConn, err := protocol.NewGameConnection("127.0.0.1", "12345")
 	if err != nil {
 		log.Panic(err)
 	}
-	ourSide := game.NewSide(game.SideSouth)
 	for {
 		msg := protocol.ReadMsg(gameConn)
 		msgType, err := protocol.GetMsgType(msg)
 		if err != nil {
 			log.Panic(err)
 		}
-
 		messageType := protocol.NewMsgType()
 		// start playing the game
 		if msgType == messageType.START {
@@ -37,10 +28,10 @@ func RunGameRandom(state *game.MancalaEnv) {
 				log.Panic(err)
 			}
 			if first {
-				move := mindlessRandom(state)
+				move := mcts.Search(state)
 				protocol.SendMsg(gameConn, protocol.CreateMoveMsg(move.Index))
 			} else {
-				ourSide = ourSide.Opposite()
+				state.OurSide = state.OurSide.Opposite()
 			}
 		} else if msgType == messageType.STATE {
 			moveTurn, err := protocol.InterpretStateMsg(msg)
@@ -48,7 +39,7 @@ func RunGameRandom(state *game.MancalaEnv) {
 				log.Panic(err)
 			}
 			if moveTurn.Move == 0 {
-				ourSide = ourSide.Opposite()
+				state.OurSide = state.OurSide.Opposite()
 			}
 
 			moveToPerform, err := game.NewMove(state.SideToMove, moveTurn.Move)
@@ -59,7 +50,7 @@ func RunGameRandom(state *game.MancalaEnv) {
 			state.PerformMove(moveToPerform)
 			if !moveTurn.End {
 				if moveTurn.Again {
-					move := mindlessRandom(state)
+					move := mcts.Search(state)
 					if move.Index == 0 {
 						protocol.SendMsg(gameConn, protocol.CreateSwapMsg())
 					} else {

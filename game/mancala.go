@@ -15,13 +15,11 @@ type MancalaEnv struct {
 }
 
 func NewMancalaEnv() *MancalaEnv {
-	log.Println("Creating a new MancalaEnv")
 	m := new(MancalaEnv)
 	return m.Reset()
 }
 
 func (m *MancalaEnv) Reset() *MancalaEnv {
-	log.Println("Reset MancalaEnv")
 	board, err := NewBoard(7, 7)
 	if err != nil {
 		log.Panic(err)
@@ -34,7 +32,6 @@ func (m *MancalaEnv) Reset() *MancalaEnv {
 }
 
 func (m *MancalaEnv) Clone() *MancalaEnv {
-	log.Println("Cloning MancalaEnv")
 	board := m.Board.Clone()
 	sideToMove := NewSide(SideSouth)
 	copier.Copy(&sideToMove, &m.SideToMove)
@@ -52,9 +49,7 @@ func (m *MancalaEnv) LegalMoves() []*Move {
 	return m.StateLegalActions(m.Board, m.SideToMove, m.NorthMoved)
 }
 
-func (m *MancalaEnv) PerformMove(move *Move) int {
-	log.Println("Performing Move..")
-	log.Printf("Before move: %v", m.Board.Board)
+func (m *MancalaEnv) PerformMove(move *Move) float64 {
 	seedsInStoreBefore := m.Board.SeedsInStore(move.Side)
 	// pie move
 	if move.Index == 0 {
@@ -69,9 +64,8 @@ func (m *MancalaEnv) PerformMove(move *Move) int {
 		m.NorthMoved = true
 	}
 	seedsInStoreAfter := m.Board.SeedsInStore(move.Side)
-	log.Printf("After move: %v", m.Board.Board)
 	// return a partial reward proportional to the number of captured seeds
-	return (seedsInStoreAfter - seedsInStoreBefore) / 100.0
+	return float64((seedsInStoreAfter - seedsInStoreBefore)) / 100.0
 }
 
 func (m MancalaEnv) StateLegalActions(board *Board, side *Side, northMoved bool) []*Move {
@@ -120,7 +114,6 @@ func (m MancalaEnv) GameOver(board *Board) bool {
 }
 
 func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, error) {
-	log.Println("Starting function MakeMove")
 	if !m.IsLegalAction(board, move, northMoved) {
 		return nil, errors.New("illegalMove: an illegal move was tried to play")
 	}
@@ -185,9 +178,7 @@ func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, 
 		if err != nil {
 			log.Panic(err)
 		}
-		log.Print(sowSeeds == 1 && sowSeedsOp > 0)
 		if sowSeeds == 1 && sowSeedsOp > 0 {
-			log.Println("Capture activated")
 			err := board.AddSeedsToStore(move.Side, 1+sowSeedsOp)
 			if err != nil {
 				log.Panic(err)
@@ -240,15 +231,28 @@ func (m MancalaEnv) SwitchSides(board *Board) {
 }
 
 func (m MancalaEnv) IsLegalAction(board *Board, move *Move, northMoved bool) bool {
-	log.Printf("action to be performed by %s: %d", move.Side.ToString(), move.Index)
-	log.Println("checking if action to be performed is legal..")
 	actions := m.StateLegalActions(board, move.Side, northMoved)
 	for _, action := range actions {
 		if move.Index == action.Index {
-			log.Printf("Legal action found")
 			return true
 		}
 	}
-	log.Println("No legal action found")
 	return false
+}
+
+func (m *MancalaEnv) ComputeFinalReward(side *Side) int {
+	return m.Board.SeedsInStore(side) - m.Board.SeedsInStore(side.Opposite())
+}
+
+func (m *MancalaEnv) ComputeEndGameReward(side *Side) (float64, error) {
+	if !m.GameOver(m.Board) {
+		return -1, errors.New("compute_end_game_reward should only be called at end of the game")
+	}
+	reward := m.ComputeFinalReward(side)
+	if reward > 0 {
+		return 1, nil
+	} else if reward < 0 {
+		return 0, nil
+	}
+	return 0.5, nil
 }
