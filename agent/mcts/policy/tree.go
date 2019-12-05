@@ -27,9 +27,9 @@ func MctpExpand(n *graph.Node) *graph.Node {
 	rand.Seed(time.Now().Unix())
 	childExpansionMove := n.UnexploredMoves[rand.Intn(len(n.UnexploredMoves))]
 	childState := n.State.Clone()
-	moveReward := childState.PerformMove(childExpansionMove)
+	childState.PerformMove(childExpansionMove)
 	childNode := graph.NewNode(childState, childExpansionMove, n)
-	childNode.Update(moveReward)
+	// childNode.Update(moveReward)
 	n.InsertChild(childNode)
 	return childNode
 }

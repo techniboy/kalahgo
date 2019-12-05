@@ -15,13 +15,11 @@ type MancalaEnv struct {
 }
 
 func NewMancalaEnv() *MancalaEnv {
-	log.Println("Creating a new MancalaEnv")
 	m := new(MancalaEnv)
 	return m.Reset()
 }
 
 func (m *MancalaEnv) Reset() *MancalaEnv {
-	log.Println("Reset MancalaEnv")
 	board, err := NewBoard(7, 7)
 	if err != nil {
 		log.Panic(err)
@@ -180,7 +178,6 @@ func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, 
 		if err != nil {
 			log.Panic(err)
 		}
-		log.Print(sowSeeds == 1 && sowSeedsOp > 0)
 		if sowSeeds == 1 && sowSeedsOp > 0 {
 			err := board.AddSeedsToStore(move.Side, 1+sowSeedsOp)
 			if err != nil {
@@ -241,4 +238,21 @@ func (m MancalaEnv) IsLegalAction(board *Board, move *Move, northMoved bool) boo
 		}
 	}
 	return false
+}
+
+func (m *MancalaEnv) ComputeFinalReward(side *Side) int {
+	return m.Board.SeedsInStore(side) - m.Board.SeedsInStore(side.Opposite())
+}
+
+func (m *MancalaEnv) ComputeEndGameReward(side *Side) (float64, error) {
+	if !m.GameOver(m.Board) {
+		return -1, errors.New("compute_end_game_reward should only be called at end of the game")
+	}
+	reward := m.ComputeFinalReward(side)
+	if reward > 0 {
+		return 1, nil
+	} else if reward < 0 {
+		return 0, nil
+	}
+	return 0.5, nil
 }

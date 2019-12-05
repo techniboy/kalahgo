@@ -25,8 +25,8 @@ func (mcts *MCTS) Search(state *game.MancalaEnv) *game.Move {
 	startTime := time.Now()
 	for time.Now().Sub(startTime).Seconds() < mcts.RunTime {
 		node := policy.MctpSelect(gameStateRoot)
-		policy.McdpSimuilate(node)
-		graph.Backpropagate(node)
+		finalState := policy.McdpSimuilate(node)
+		policy.McrpBackpropagate(node, finalState)
 		gamesPlayed++
 	}
 	maxChild, err := graph.SelectMaxChild(gameStateRoot)

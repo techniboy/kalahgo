@@ -32,7 +32,6 @@ func NewBoard(holes int, seeds int) (*Board, error) {
 }
 
 func (b *Board) Clone() *Board {
-	log.Println("Cloning board..")
 	cloneBoard, err := NewBoard(b.Holes, 0)
 	if err != nil {
 		log.Panic(err)

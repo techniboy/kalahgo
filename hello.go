@@ -21,5 +21,5 @@ func main() {
 
 	state := game.NewMancalaEnv()
 	// agent.RunGameRandom(state)
-	agent.RunGameMCTS(state, mcts.NewMCTS(5))
+	agent.RunGameMCTS(state, mcts.NewMCTS(1))
 }
