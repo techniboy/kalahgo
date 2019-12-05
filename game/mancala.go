@@ -113,6 +113,10 @@ func (m MancalaEnv) GameOver(board *Board) bool {
 	return false
 }
 
+func (m *MancalaEnv) IsGameOver() bool {
+	return m.GameOver(m.Board)
+}
+
 func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, error) {
 	if !m.IsLegalAction(board, move, northMoved) {
 		return nil, errors.New("illegalMove: an illegal move was tried to play")

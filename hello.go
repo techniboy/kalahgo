@@ -4,10 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/techniboy/kalahgo/agent/mcts"
-
 	"github.com/techniboy/kalahgo/agent"
-	"github.com/techniboy/kalahgo/game"
 )
 
 func main() {
@@ -19,7 +16,6 @@ func main() {
 
 	log.SetOutput(file)
 
-	state := game.NewMancalaEnv()
 	// agent.RunGameRandom(state)
-	agent.RunGameMCTS(state, mcts.NewMCTS(1))
+	agent.RunGameMCTS()
 }
