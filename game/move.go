@@ -1,6 +1,9 @@
 package game
 
-import "errors"
+import (
+	"errors"
+	"log"
+)
 
 // Move represents a whole (if greater than 1) or the pie action if 0.
 type Move struct {
@@ -17,4 +20,12 @@ func NewMove(side *Side, index int) (*Move, error) {
 	m.Side = side
 	m.Index = index
 	return m, nil
+}
+
+func (m *Move) Clone() *Move {
+	cloneMove, err := NewMove(NewSide(m.Side.Index()), m.Index)
+	if err != nil {
+		log.Panic(err)
+	}
+	return cloneMove
 }

@@ -23,6 +23,16 @@ func NewNode(state *game.MancalaEnv, move *game.Move, parent *Node) *Node {
 	return n
 }
 
+func (n *Node) Clone() *Node {
+	cloneNode := NewNode(n.State.Clone(), n.Move.Clone(), n.Parent.Clone())
+	cloneNode.Visits = n.Visits
+	cloneNode.Reward = n.Reward
+	for _, child := range n.Children {
+		cloneNode.Children = append(cloneNode.Children, child.Clone())
+	}
+	return cloneNode
+}
+
 func (n *Node) InsertChild(child *Node) {
 	n.Children = append(n.Children, child)
 	for i, move := range n.UnexploredMoves {
