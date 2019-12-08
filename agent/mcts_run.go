@@ -2,6 +2,8 @@ package agent
 
 import (
 	"log"
+	"math/rand"
+	"time"
 
 	"github.com/techniboy/kalahgo/agent/mcts"
 	"github.com/techniboy/kalahgo/game"
@@ -10,13 +12,15 @@ import (
 
 func RunGameMCTS() {
 	log.Println("starting game...")
-	gameConn, err := protocol.NewGameConnection("127.0.0.1", "12345")
+	rand.Seed(time.Now().Unix())
+	gameConn, err := protocol.NewGameConnection("127.0.0.1", "12340")
 	if err != nil {
 		log.Panic(err)
 	}
 	mcts := mcts.NewMCTS()
 	state := game.NewMancalaEnv()
 	go mcts.Search()
+	// go mcts.Search()
 	for {
 		msg := protocol.ReadMsg(gameConn)
 		msgType, err := protocol.GetMsgType(msg)

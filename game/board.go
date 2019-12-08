@@ -18,7 +18,6 @@ func NewBoard(holes int, seeds int) (*Board, error) {
 	if seeds < 0 {
 		return nil, errors.New("valueError: there has to be non-negative no. of seeds")
 	}
-
 	b.Holes = holes
 	b.Board = make([][]int, 2)
 	for i := range b.Board {
@@ -36,7 +35,7 @@ func (b *Board) Clone() *Board {
 	if err != nil {
 		log.Panic(err)
 	}
-	for hole := 1; hole < b.Holes+1; hole++ {
+	for hole := 0; hole < b.Holes+1; hole++ {
 		cloneBoard.Board[SideNorth][hole] = b.Board[SideNorth][hole]
 		cloneBoard.Board[SideSouth][hole] = b.Board[SideSouth][hole]
 	}

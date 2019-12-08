@@ -3,7 +3,6 @@ package policy
 import (
 	"log"
 	"math/rand"
-	"time"
 
 	"github.com/techniboy/kalahgo/agent/mcts/graph"
 )
@@ -24,7 +23,6 @@ func MctpSelect(n *graph.Node) *graph.Node {
 }
 
 func MctpExpand(n *graph.Node) *graph.Node {
-	rand.Seed(time.Now().Unix())
 	childExpansionMove := n.UnexploredMoves[rand.Intn(len(n.UnexploredMoves))]
 	childState := n.State.Clone()
 	childState.PerformMove(childExpansionMove)

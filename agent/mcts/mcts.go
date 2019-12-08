@@ -11,7 +11,6 @@ import (
 )
 
 type MCTS struct {
-	RunTime     float64
 	Root        *graph.Node
 	mutex       sync.Mutex
 	GamesPlayed int
@@ -41,9 +40,9 @@ func (mcts *MCTS) BestMove() *game.Move {
 	}
 	for {
 		mcts.mutex.Lock()
-		if mcts.Root.Visits < 50 {
+		if mcts.Root.Visits < 15000 {
 			mcts.mutex.Unlock()
-			time.Sleep(1 * time.Second)
+			time.Sleep(2 * time.Second)
 		} else {
 			selectedNode, err := graph.SelectRobustChild(mcts.Root)
 			if err != nil {

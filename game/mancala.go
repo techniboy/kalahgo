@@ -3,8 +3,6 @@ package game
 import (
 	"errors"
 	"log"
-
-	"github.com/jinzhu/copier"
 )
 
 type MancalaEnv struct {
@@ -34,9 +32,8 @@ func (m *MancalaEnv) Reset() *MancalaEnv {
 func (m *MancalaEnv) Clone() *MancalaEnv {
 	board := m.Board.Clone()
 	sideToMove := NewSide(SideSouth)
-	copier.Copy(&sideToMove, &m.SideToMove)
-	northMoved := false
-	copier.Copy(&northMoved, &m.NorthMoved)
+	sideToMove.IsNorth = m.SideToMove.IsNorth
+	northMoved := m.NorthMoved
 
 	cloneGame := NewMancalaEnv()
 	cloneGame.Board = board
@@ -250,13 +247,13 @@ func (m *MancalaEnv) ComputeFinalReward(side *Side) int {
 
 func (m *MancalaEnv) ComputeEndGameReward(side *Side) (float64, error) {
 	if !m.GameOver(m.Board) {
-		return -1, errors.New("compute_end_game_reward should only be called at end of the game")
+		return -5, errors.New("compute_end_game_reward should only be called at end of the game")
 	}
 	reward := m.ComputeFinalReward(side)
 	if reward > 0 {
 		return 1, nil
 	} else if reward < 0 {
-		return 0, nil
+		return -1, nil
 	}
-	return 0.5, nil
+	return 0, nil
 }
