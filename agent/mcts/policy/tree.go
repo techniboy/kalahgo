@@ -11,12 +11,11 @@ func MctpSelect(n *graph.Node) *graph.Node {
 	for !n.IsTerminal() {
 		if !n.IsFullyExplored() {
 			return MctpExpand(n)
-		} else {
-			var err error
-			n, err = graph.SelectBestChild(n)
-			if err != nil {
-				log.Panic(err)
-			}
+		}
+		var err error
+		n, err = graph.SelectBestChild(n)
+		if err != nil {
+			log.Panic(err)
 		}
 	}
 	return n
