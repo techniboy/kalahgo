@@ -2,6 +2,7 @@ package mcts
 
 import (
 	"log"
+	"math/rand"
 	"sync"
 	"time"
 
@@ -23,6 +24,7 @@ func NewMCTS() *MCTS {
 }
 
 func (mcts *MCTS) Search() {
+	rand.Seed(time.Now().Unix())
 	for !mcts.Root.State.IsGameOver() {
 		node := policy.MctpSelect(mcts.Root)
 		finalState := policy.McdpSimuilate(node)
@@ -40,9 +42,9 @@ func (mcts *MCTS) BestMove() *game.Move {
 	}
 	for {
 		mcts.mutex.Lock()
-		if mcts.Root.Visits < 15000 {
+		if mcts.Root.Visits < 100000 {
 			mcts.mutex.Unlock()
-			time.Sleep(2 * time.Second)
+			time.Sleep(5 * time.Second)
 		} else {
 			selectedNode, err := graph.SelectRobustChild(mcts.Root)
 			if err != nil {
