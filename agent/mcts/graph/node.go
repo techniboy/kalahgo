@@ -1,6 +1,8 @@
 package graph
 
 import (
+	"log"
+
 	"github.com/techniboy/kalahgo/game"
 )
 
@@ -21,6 +23,31 @@ func NewNode(state *game.MancalaEnv, move *game.Move, parent *Node) *Node {
 	n.Move = move
 	n.UnexploredMoves = state.LegalMoves()
 	return n
+}
+
+func (n *Node) Clone() *Node {
+	var (
+		cloneMove   *game.Move
+		cloneParent *Node
+	)
+	if n.Move == nil {
+		cloneMove = nil
+	} else {
+		var err error
+		cloneMove, err = game.NewMove(game.NewSide(n.Move.Side.Index()), n.Move.Index)
+		if err != nil {
+			log.Panic(err)
+		}
+	}
+	if n.Parent == nil {
+		cloneParent = nil
+	} else {
+		cloneParent = n.Parent.Clone()
+	}
+	cloneNode := NewNode(n.State.Clone(), cloneMove, cloneParent)
+	cloneNode.Visits = n.Visits
+	cloneNode.Reward = n.Reward
+	return cloneNode
 }
 
 func (n *Node) InsertChild(child *Node) {

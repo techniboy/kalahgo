@@ -1,6 +1,8 @@
 package game
 
-import "errors"
+import (
+	"errors"
+)
 
 // Move represents a whole (if greater than 1) or the pie action if 0.
 type Move struct {

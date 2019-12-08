@@ -6,15 +6,6 @@ import (
 	"sort"
 )
 
-func Backpropagate(n *Node) {
-	reward := n.Reward
-	parent := n.Parent
-	for parent != nil {
-		parent.Update(reward)
-		parent = parent.Parent
-	}
-}
-
 func SelectBestChild(n *Node) (*Node, error) {
 	if n.IsTerminal() {
 		return nil, errors.New("valueError: this is a terminal node, has no child")

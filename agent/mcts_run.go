@@ -8,12 +8,15 @@ import (
 	"github.com/techniboy/kalahgo/protocol"
 )
 
-func RunGameMCTS(state *game.MancalaEnv, mcts *mcts.MCTS) {
+func RunGameMCTS() {
 	log.Println("starting game...")
-	gameConn, err := protocol.NewGameConnection("127.0.0.1", "12345")
+	gameConn, err := protocol.NewGameConnection("127.0.0.1", "12340")
 	if err != nil {
 		log.Panic(err)
 	}
+	mcts := mcts.NewMCTS()
+	state := game.NewMancalaEnv()
+	go mcts.Search()
 	for {
 		msg := protocol.ReadMsg(gameConn)
 		msgType, err := protocol.GetMsgType(msg)
@@ -28,7 +31,7 @@ func RunGameMCTS(state *game.MancalaEnv, mcts *mcts.MCTS) {
 				log.Panic(err)
 			}
 			if first {
-				move := mcts.Search(state)
+				move := mcts.BestMove()
 				protocol.SendMsg(gameConn, protocol.CreateMoveMsg(move.Index))
 			} else {
 				state.OurSide = state.OurSide.Opposite()
@@ -38,19 +41,15 @@ func RunGameMCTS(state *game.MancalaEnv, mcts *mcts.MCTS) {
 			if err != nil {
 				log.Panic(err)
 			}
-			if moveTurn.Move == 0 {
-				state.OurSide = state.OurSide.Opposite()
-			}
-
 			moveToPerform, err := game.NewMove(state.SideToMove, moveTurn.Move)
 			if err != nil {
 				log.Panic(err)
 			}
-
 			state.PerformMove(moveToPerform)
+			mcts.PerformMove(moveToPerform.Index)
 			if !moveTurn.End {
 				if moveTurn.Again {
-					move := mcts.Search(state)
+					move := mcts.BestMove()
 					if move.Index == 0 {
 						protocol.SendMsg(gameConn, protocol.CreateSwapMsg())
 					} else {
@@ -59,6 +58,7 @@ func RunGameMCTS(state *game.MancalaEnv, mcts *mcts.MCTS) {
 				}
 			}
 		} else if msgType == messageType.END {
+			log.Printf("total games played = %d", mcts.GamesPlayed)
 			log.Println("Game engine ended the game")
 			break
 		} else {
