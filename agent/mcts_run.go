@@ -8,12 +8,8 @@ import (
 	"github.com/techniboy/kalahgo/protocol"
 )
 
-func RunGameMCTS() {
+func RunGameMCTS(gameConn *protocol.GameConnection) {
 	log.Println("starting game...")
-	gameConn, err := protocol.NewGameConnection("127.0.0.1", "12340")
-	if err != nil {
-		log.Panic(err)
-	}
 	mcts := mcts.NewMCTS()
 	state := game.NewMancalaEnv()
 	go mcts.Search()

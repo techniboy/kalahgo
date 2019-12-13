@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/techniboy/kalahgo/agent"
+	"github.com/techniboy/kalahgo/protocol"
 )
 
 func main() {
@@ -16,6 +17,9 @@ func main() {
 
 	log.SetOutput(file)
 
-	// agent.RunGameRandom(state)
-	agent.RunGameMCTS()
+	gameConn, err := protocol.NewGameConnection("127.0.0.1", "12340")
+	if err != nil {
+		log.Panic(err)
+	}
+	agent.RunGameMCTS(gameConn)
 }
