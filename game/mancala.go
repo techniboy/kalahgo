@@ -78,7 +78,7 @@ func (m MancalaEnv) StateLegalActions(board *Board, side *Side, northMoved bool)
 	}
 
 	for i := 1; i < board.Holes+1; i++ {
-		if board.HoleVal(side.Index(), i) > 0 {
+		if board.Board[side.Index()][i] > 0 {
 			move, err := NewMove(side, i)
 			if err != nil {
 				panic(err)
@@ -224,9 +224,9 @@ func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, 
 
 func (m MancalaEnv) SwitchSides(board *Board) {
 	for hole := 1; hole < board.Holes+1; hole++ {
-		temp := board.HoleVal(SideNorth, hole)
-		board.SetHoleVal(board.HoleVal(SideSouth, hole), SideNorth, hole)
-		board.SetHoleVal(temp, SideSouth, hole)
+		temp := board.Board[SideNorth][hole]
+		board.Board[SideNorth][hole] = board.Board[SideSouth][hole]
+		board.Board[SideSouth][hole] = temp
 	}
 }
 
