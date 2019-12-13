@@ -1,7 +1,6 @@
 package agent
 
 import (
-	"log"
 	"math/rand"
 	"time"
 
@@ -15,7 +14,6 @@ func mindlessRandom(state *game.MancalaEnv) *game.Move {
 }
 
 func RunGameRandom(state *game.MancalaEnv) {
-	log.Println("starting game...")
 	rand.Seed(time.Now().Unix())
 	gameConn, err := protocol.NewGameConnection("127.0.0.1", "12345")
 	if err != nil {
