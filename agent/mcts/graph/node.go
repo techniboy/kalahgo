@@ -1,8 +1,6 @@
 package graph
 
 import (
-	"log"
-
 	"github.com/techniboy/kalahgo/game"
 )
 
@@ -36,7 +34,7 @@ func (n *Node) Clone() *Node {
 		var err error
 		cloneMove, err = game.NewMove(game.NewSide(n.Move.Side.Index()), n.Move.Index)
 		if err != nil {
-			log.Panic(err)
+			panic(err)
 		}
 	}
 	if n.Parent == nil {

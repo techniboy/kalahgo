@@ -2,7 +2,6 @@ package game
 
 import (
 	"errors"
-	"log"
 )
 
 type MancalaEnv struct {
@@ -20,7 +19,7 @@ func NewMancalaEnv() *MancalaEnv {
 func (m *MancalaEnv) Reset() *MancalaEnv {
 	board, err := NewBoard(7, 7)
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 	m.Board = board
 	m.SideToMove = NewSide(SideSouth)
@@ -54,7 +53,7 @@ func (m *MancalaEnv) PerformMove(move *Move) float64 {
 	}
 	sideToMove, err := m.MakeMove(m.Board, move, m.NorthMoved)
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 	m.SideToMove = sideToMove
 	if move.Side.IsNorth {
@@ -73,7 +72,7 @@ func (m MancalaEnv) StateLegalActions(board *Board, side *Side, northMoved bool)
 	} else {
 		move, err := NewMove(side, 0)
 		if err != nil {
-			log.Panic(err)
+			panic(err)
 		}
 		legalMoves = append(legalMoves, move)
 	}
@@ -82,7 +81,7 @@ func (m MancalaEnv) StateLegalActions(board *Board, side *Side, northMoved bool)
 		if board.HoleVal(side.Index(), i) > 0 {
 			move, err := NewMove(side, i)
 			if err != nil {
-				log.Panic(err)
+				panic(err)
 			}
 			legalMoves = append(legalMoves, move)
 		}
@@ -94,7 +93,7 @@ func (m MancalaEnv) HolesEmpty(board *Board, side *Side) bool {
 	for hole := 1; hole < board.Holes+1; hole++ {
 		seeds, err := board.Seeds(side, hole)
 		if err != nil {
-			log.Panic(err)
+			panic(err)
 		}
 		if seeds > 0 {
 			return false
@@ -126,7 +125,7 @@ func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, 
 
 	seedsToSow, err := board.Seeds(move.Side, move.Index)
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 	board.SetSeeds(move.Side, move.Index, 0)
 
@@ -173,24 +172,24 @@ func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, 
 	if sowHole > 0 && sowSide.Index() == move.Side.Index() {
 		sowSeeds, err := board.Seeds(sowSide, sowHole)
 		if err != nil {
-			log.Panic(err)
+			panic(err)
 		}
 		sowSeedsOp, err := board.SeedsOp(sowSide, sowHole)
 		if err != nil {
-			log.Panic(err)
+			panic(err)
 		}
 		if sowSeeds == 1 && sowSeedsOp > 0 {
 			err := board.AddSeedsToStore(move.Side, 1+sowSeedsOp)
 			if err != nil {
-				log.Panic(err)
+				panic(err)
 			}
 			err = board.SetSeeds(move.Side, sowHole, 0)
 			if err != nil {
-				log.Panic(err)
+				panic(err)
 			}
 			err = board.SetSeedsOp(move.Side, sowHole, 0)
 			if err != nil {
-				log.Panic(err)
+				panic(err)
 			}
 		}
 	}
@@ -206,13 +205,13 @@ func (m MancalaEnv) MakeMove(board *Board, move *Move, northMoved bool) (*Side, 
 		for hole := 1; hole < board.Holes+1; hole++ {
 			collectingSideSeeds, err := board.Seeds(collectingSide, hole)
 			if err != nil {
-				log.Panic(err)
+				panic(err)
 			}
 			seeds += collectingSideSeeds
 		}
 		err := board.AddSeedsToStore(collectingSide, seeds)
 		if err != nil {
-			log.Panic(err)
+			panic(err)
 		}
 	}
 

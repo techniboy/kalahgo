@@ -1,7 +1,6 @@
 package policy
 
 import (
-	"log"
 	"math/rand"
 
 	"github.com/techniboy/kalahgo/agent/mcts/graph"
@@ -15,7 +14,7 @@ func MctpSelect(n *graph.Node) *graph.Node {
 		var err error
 		n, err = graph.SelectBestChild(n)
 		if err != nil {
-			log.Panic(err)
+			panic(err)
 		}
 	}
 	return n

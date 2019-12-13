@@ -2,7 +2,6 @@ package game
 
 import (
 	"errors"
-	"log"
 )
 
 type Board struct {
@@ -38,7 +37,7 @@ func (b *Board) SetHoleVal(val int, r int, c int) {
 func (b *Board) Clone() *Board {
 	cloneBoard, err := NewBoard(b.Holes, 0)
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 	for hole := 0; hole < b.Holes+1; hole++ {
 		cloneBoard.SetHoleVal(b.HoleVal(SideNorth, hole), SideNorth, hole)
@@ -118,7 +117,7 @@ func (b *Board) IsSeedable(side *Side, hole int) bool {
 	for otherHole := hole - 1; otherHole > 0; otherHole-- {
 		seeds, err := b.Seeds(side, otherHole)
 		if err != nil {
-			log.Panic(err)
+			panic(err)
 		}
 		if seeds == hole-otherHole {
 			return true

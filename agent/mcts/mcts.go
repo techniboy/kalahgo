@@ -1,7 +1,6 @@
 package mcts
 
 import (
-	"log"
 	"math/rand"
 	"sync"
 	"time"
@@ -48,7 +47,7 @@ func (mcts *MCTS) BestMove() *game.Move {
 		} else {
 			selectedNode, err := graph.SelectRobustChild(mcts.Root)
 			if err != nil {
-				log.Panic(err)
+				panic(err)
 			}
 			mcts.mutex.Unlock()
 			return selectedNode.Move
@@ -74,7 +73,7 @@ func (mcts *MCTS) PerformMove(moveIndex int) {
 		if unexploredMove.Index == moveIndex {
 			move, err := game.NewMove(mcts.Root.State.SideToMove, moveIndex)
 			if err != nil {
-				log.Panic(err)
+				panic(err)
 			}
 			mcts.Root.State.PerformMove(move)
 			mcts.Root = graph.NewNode(mcts.Root.State, unexploredMove, nil)
@@ -83,5 +82,5 @@ func (mcts *MCTS) PerformMove(moveIndex int) {
 		}
 	}
 	mcts.mutex.Unlock()
-	log.Panic("No child with the same move was found")
+	panic("No child with the same move was found")
 }
