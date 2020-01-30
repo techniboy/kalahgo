@@ -8,13 +8,13 @@ import (
 	"github.com/techniboy/kalahgo/protocol"
 )
 
-func RunGameMCTS(gameConn *protocol.GameConnection) {
+func RunGameMCTS() {
 	log.Println("starting game...")
 	mcts := mcts.NewMCTS()
 	state := game.NewMancalaEnv()
 	go mcts.Search()
 	for {
-		msg := protocol.ReadMsg(gameConn)
+		msg := protocol.ReadMsg()
 		msgType, err := protocol.GetMsgType(msg)
 		if err != nil {
 			log.Panic(err)
@@ -28,7 +28,7 @@ func RunGameMCTS(gameConn *protocol.GameConnection) {
 			}
 			if first {
 				move := mcts.BestMove()
-				protocol.SendMsg(gameConn, protocol.CreateMoveMsg(move.Index))
+				protocol.SendMsg(protocol.CreateMoveMsg(move.Index))
 			} else {
 				state.OurSide = state.OurSide.Opposite()
 			}
@@ -47,9 +47,9 @@ func RunGameMCTS(gameConn *protocol.GameConnection) {
 				if moveTurn.Again {
 					move := mcts.BestMove()
 					if move.Index == 0 {
-						protocol.SendMsg(gameConn, protocol.CreateSwapMsg())
+						protocol.SendMsg(protocol.CreateSwapMsg())
 					} else {
-						protocol.SendMsg(gameConn, protocol.CreateMoveMsg(move.Index))
+						protocol.SendMsg(protocol.CreateMoveMsg(move.Index))
 					}
 				}
 			}

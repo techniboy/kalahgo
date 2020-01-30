@@ -17,13 +17,15 @@ func mindlessRandom(state *game.MancalaEnv) *game.Move {
 func RunGameRandom(state *game.MancalaEnv) {
 	log.Println("starting game...")
 	rand.Seed(time.Now().Unix())
-	gameConn, err := protocol.NewGameConnection("127.0.0.1", "12345")
-	if err != nil {
-		log.Panic(err)
-	}
+	//gameConn, err := protocol.NewGameConnection("127.0.0.1", "12345")
+	/*
+		if err != nil {
+			log.Panic(err)
+		}
+	*/
 	ourSide := game.NewSide(game.SideSouth)
 	for {
-		msg := protocol.ReadMsg(gameConn)
+		msg := protocol.ReadMsg()
 		msgType, err := protocol.GetMsgType(msg)
 		if err != nil {
 			log.Panic(err)
@@ -38,7 +40,7 @@ func RunGameRandom(state *game.MancalaEnv) {
 			}
 			if first {
 				move := mindlessRandom(state)
-				protocol.SendMsg(gameConn, protocol.CreateMoveMsg(move.Index))
+				protocol.SendMsg(protocol.CreateMoveMsg(move.Index))
 			} else {
 				ourSide = ourSide.Opposite()
 			}
@@ -61,9 +63,9 @@ func RunGameRandom(state *game.MancalaEnv) {
 				if moveTurn.Again {
 					move := mindlessRandom(state)
 					if move.Index == 0 {
-						protocol.SendMsg(gameConn, protocol.CreateSwapMsg())
+						protocol.SendMsg(protocol.CreateSwapMsg())
 					} else {
-						protocol.SendMsg(gameConn, protocol.CreateMoveMsg(move.Index))
+						protocol.SendMsg(protocol.CreateMoveMsg(move.Index))
 					}
 				}
 			}
